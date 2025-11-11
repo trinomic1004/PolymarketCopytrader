@@ -11,20 +11,20 @@ your_account:
   total_capital: 230
 
 traders:
-  #- name: "Hans323"
-    #wallet_address: "0x0f37cb80dee49d55b5f6d9e595d52591d6371410"
-    #allocated_capital: 25
-    #enabled: true
+  - name: "Hans323"
+    wallet_address: "0x0f37cb80dee49d55b5f6d9e595d52591d6371410"
+    allocated_capital: 50
+    enabled: true
 
-  #- name: "AgricultureSecretary"
-    #wallet_address: "0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834"
-    #allocated_capital: 100
-    #enabled: true
+  - name: "AgricultureSecretary"
+    wallet_address: "0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834"
+    allocated_capital: 50
+    enabled: true
 
   - name: "Mayuravarma"
-   wallet_address: "0x3657862e57070b82a289b5887ec943a7c2166b14"
+    wallet_address: "0x3657862e57070b82a289b5887ec943a7c2166b14"
     allocated_capital: 20
-    enabled: true
+    enabled: enable
   
 
 risk_management:
@@ -35,7 +35,7 @@ risk_management:
 
   per_trader:
     min_portfolio_value: 100.0
-    max_position_pct: 0.5
+    max_position_pct: 1
     use_portfolio_proportion: true
 
   market_filters:
