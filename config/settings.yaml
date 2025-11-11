@@ -1,0 +1,54 @@
+# Example multi-trader copytrader configuration
+
+your_account:
+  # Use env:VAR form to pull from environment
+  private_key: "env:POLYMARKET_PRIVATE_KEY"
+  proxy_address: "env:POLYMARKET_PROXY_ADDRESS"
+  signature_type: 1
+  api_key: "env:POLYMARKET_API_KEY"
+  api_secret: "env:POLYMARKET_API_SECRET"
+  api_passphrase: "env:POLYMARKET_API_PASSPHRASE"
+  total_capital: 230
+
+traders:
+  #- name: "Hans323"
+    #wallet_address: "0x0f37cb80dee49d55b5f6d9e595d52591d6371410"
+    #allocated_capital: 25
+    #enabled: true
+
+  #- name: "AgricultureSecretary"
+    #wallet_address: "0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834"
+    #allocated_capital: 100
+    #enabled: true
+
+  - name: "Mayuravarma"
+   wallet_address: "0x3657862e57070b82a289b5887ec943a7c2166b14"
+    allocated_capital: 20
+    enabled: true
+  
+
+risk_management:
+  global:
+    max_total_exposure: 5000.0
+    max_single_bet: 500.0
+    reserve_capital: 1000.0
+
+  per_trader:
+    min_portfolio_value: 100.0
+    max_position_pct: 0.5
+    use_portfolio_proportion: true
+
+  market_filters:
+    whitelist_categories: []
+    blacklist_categories: []
+    min_liquidity: 500.0
+
+monitoring:
+  poll_interval: 5
+  portfolio_sync_interval: 60
+
+logging:
+  level: "INFO"
+  file: "copytrade.log"
+  trades_file: "trades.csv"
+

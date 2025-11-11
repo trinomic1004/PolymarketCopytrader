@@ -1,0 +1,6 @@
+__pycache__/
+.env
+state/
+copytrade.log
+trades.csv
+/*.pyc
