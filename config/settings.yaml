@@ -23,9 +23,9 @@ traders:
 
   - name: "Mayuravarma"
     wallet_address: "0x3657862e57070b82a289b5887ec943a7c2166b14"
-    allocated_capital: 20
-    enabled: enable
-  
+    allocated_capital: 80
+    enabled: true
+
 
 risk_management:
   global:
@@ -51,4 +51,3 @@ logging:
   level: "INFO"
   file: "copytrade.log"
   trades_file: "trades.csv"
-

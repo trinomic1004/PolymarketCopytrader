@@ -239,3 +239,35 @@
 2025-11-11 20:11:23,322 | INFO | - AgricultureSecretary (0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834)
 2025-11-11 20:11:23,322 | INFO | - Mayuravarma (0x3657862e57070b82a289b5887ec943a7c2166b14)
 2025-11-11 20:12:08,233 | INFO | Stopping copytrader...
+2025-11-11 21:09:13,093 | INFO | Starting multi-trader copytrader...
+2025-11-11 21:09:13,094 | INFO | Watching 3 traders:
+2025-11-11 21:09:13,094 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-11 21:09:13,094 | INFO | - AgricultureSecretary (0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834)
+2025-11-11 21:09:13,095 | INFO | - Mayuravarma (0x3657862e57070b82a289b5887ec943a7c2166b14)
+2025-11-11 21:09:17,900 | INFO | Stopping copytrader...
+2025-11-11 21:10:55,597 | INFO | Starting multi-trader copytrader...
+2025-11-11 21:10:55,598 | INFO | Watching 3 traders:
+2025-11-11 21:10:55,598 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-11 21:10:55,598 | INFO | - AgricultureSecretary (0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834)
+2025-11-11 21:10:55,598 | INFO | - Mayuravarma (0x3657862e57070b82a289b5887ec943a7c2166b14)
+2025-11-11 21:13:17,676 | INFO | Starting multi-trader copytrader...
+2025-11-11 21:13:17,677 | INFO | Watching 3 traders:
+2025-11-11 21:13:17,677 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-11 21:13:17,677 | INFO | - AgricultureSecretary (0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834)
+2025-11-11 21:13:17,677 | INFO | - Mayuravarma (0x3657862e57070b82a289b5887ec943a7c2166b14)
+2025-11-11 21:13:36,351 | INFO | Stopping copytrader...
+2025-11-11 21:18:13,569 | INFO | Starting multi-trader copytrader...
+2025-11-11 21:18:13,569 | INFO | Watching 3 traders:
+2025-11-11 21:18:13,570 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-11 21:18:13,570 | INFO | - AgricultureSecretary (0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834)
+2025-11-11 21:18:13,570 | INFO | - Mayuravarma (0x3657862e57070b82a289b5887ec943a7c2166b14)
+2025-11-11 21:21:51,441 | INFO | Copied Hans323: $12.24 (24.49% of trader portfolio; deployment 100.0%) order=0x32f6ed49fa019a8d10eb8de7ca2ae6fca3815df53664c6d0ad36f240aec01a72
+2025-11-12 06:17:05,701 | INFO | Copied Mayuravarma: $2.60 (0.25% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0xca7270067ca7d8e4d6e64cbaa0041ae911e1946259ffbd7d3fe785f9aa1fa82c
+2025-11-12 06:45:31,537 | INFO | Copied Mayuravarma: $2.60 (0.08% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0x40b647f5a1f02dfd341efaa9d4d648465dbc5a5dc09ee4185da06aa7b858acbd
+2025-11-12 08:52:48,502 | ERROR | Order failed: PolyApiException[status_code=400, error_message={'error': 'not enough balance / allowance'}]
+2025-11-12 09:57:30,327 | INFO | Stopping copytrader...
+2025-11-12 10:00:20,477 | INFO | Starting multi-trader copytrader...
+2025-11-12 10:00:20,479 | INFO | Watching 3 traders:
+2025-11-12 10:00:20,479 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-12 10:00:20,479 | INFO | - AgricultureSecretary (0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834)
+2025-11-12 10:00:20,479 | INFO | - Mayuravarma (0x3657862e57070b82a289b5887ec943a7c2166b14)
