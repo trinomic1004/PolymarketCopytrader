@@ -13,17 +13,27 @@ your_account:
 traders:
   - name: "Hans323"
     wallet_address: "0x0f37cb80dee49d55b5f6d9e595d52591d6371410"
-    allocated_capital: 50
+    allocated_capital: 110
     enabled: true
 
   - name: "AgricultureSecretary"
     wallet_address: "0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834"
     allocated_capital: 50
-    enabled: true
+    enabled: false
 
   - name: "Mayuravarma"
     wallet_address: "0x3657862e57070b82a289b5887ec943a7c2166b14"
     allocated_capital: 80
+    enabled: false
+
+  - name: "25usdc"
+    wallet_address: "0x75e765216a57942d738d880ffcda854d9f869080"
+    allocated_capital: 110
+    enabled: false
+
+  - name: "piastri"
+    wallet_address: "0x2f09642639aedd6ced432519c1a86e7d52034632"
+    allocated_capital: 110
     enabled: true
 
 
@@ -34,7 +44,7 @@ risk_management:
     reserve_capital: 1000.0
 
   per_trader:
-    min_portfolio_value: 100.0
+    min_portfolio_value: 0.0
     max_position_pct: 1
     use_portfolio_proportion: true
 
@@ -46,6 +56,13 @@ risk_management:
 monitoring:
   poll_interval: 5
   portfolio_sync_interval: 60
+
+trade_tracking:
+  enabled: true
+  output_dir: "state/trader_trades"
+  state_path: "state/trade_history_state.json"
+  poll_interval: 30
+  log_level: "INFO"
 
 logging:
   level: "INFO"

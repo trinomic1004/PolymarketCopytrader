@@ -1,0 +1,2 @@
+timestamp_iso,timestamp_unix,transaction_hash,side,size,price,market,token_id,title,outcome
+1970-01-01T00:00:01+00:00,1,0xabc,BUY,10.000000,0.500000,m1,t1,Q1,Yes

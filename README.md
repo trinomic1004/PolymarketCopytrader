@@ -29,8 +29,9 @@ Setup
 
 Run
 ---
-- Start copytrader: `python -m src.cli start --config config/settings.yaml`
+- Start copytrader: `python -m src.cli start --config config/settings.yaml` (automatically mirrors trades *and* streams each watched trader's fills into CSVs under `state/trader_trades/`)
 - Status (best when running): `python -m src.cli status`
+- Record trader trade history only: `python -m src.cli track-trades --config config/settings.yaml` (standalone tracker without executing copy trades)
 
 Notes
 -----
@@ -38,3 +39,9 @@ Notes
 - Proportional sizing considers trader portfolio value and your allocated capital.
 - See `reference-bot/context_polymarket.md` for Polymarket API details used here.
 
+Trade Tracking
+--------------
+- `trade_tracking` config block controls the per-trader history recorder that now runs alongside the copytrader.
+- Defaults write CSVs to `state/trader_trades/` and resume progress from `state/trade_history_state.json`.
+- Adjust `poll_interval` or point `output_dir` somewhere else if you want a different cadence or storage location.
+- Run `python -m src.cli track-trades ...` to operate the recorder standalone without placing orders.

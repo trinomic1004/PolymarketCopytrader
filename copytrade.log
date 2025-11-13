@@ -271,3 +271,40 @@
 2025-11-12 10:00:20,479 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
 2025-11-12 10:00:20,479 | INFO | - AgricultureSecretary (0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834)
 2025-11-12 10:00:20,479 | INFO | - Mayuravarma (0x3657862e57070b82a289b5887ec943a7c2166b14)
+2025-11-12 11:54:39,325 | INFO | Copied Hans323: $1.00 (0.11% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0x9e43fe36b2ac7ff30c65e41610b65fee1616d0c22b2a82f847a4661544ddd1a3
+2025-11-12 12:50:14,136 | INFO | Copied Hans323: $1.00 (0.02% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0x8835720c89adc9960d077deb370ffb30e4e5120c0bddd218df9bcb359d1d1fd1
+2025-11-12 14:48:19,841 | INFO | Starting multi-trader copytrader...
+2025-11-12 14:48:19,842 | INFO | Watching 3 traders:
+2025-11-12 14:48:19,842 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-12 14:48:19,842 | INFO | - AgricultureSecretary (0x6ffb4354cbe6e0f9989e3b55564ec5fb8646a834)
+2025-11-12 14:48:19,843 | INFO | - Mayuravarma (0x3657862e57070b82a289b5887ec943a7c2166b14)
+2025-11-12 15:35:51,875 | INFO | Copied AgricultureSecretary: $1.00 (0.01% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0xb638d0aace7e2a87765af3e198411b1a9db7e7e49a635e473bb631dbad5640fa
+2025-11-12 15:47:48,573 | INFO | Copied Hans323: $1.00 (0.62% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0x90c9917948e43a0ca31a03c8d3e5ba02759890b7d246d0d3153df6d25e3b7772
+2025-11-12 16:09:31,803 | INFO | Copied Hans323: $5.00 (2.87% of trader portfolio; deployment 100.0%; raised to market min 5.0000 shares) order=0x5232c55408621fe5e86a7351dbb6701d00176c4d01b2030b846d13a5b825d9ac
+2025-11-12 16:22:06,811 | INFO | Copied Hans323: $1.00 (0.02% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0x139721896dca14447d4303bb6b4b7701429541b85c58dff77956fe920188e7e1
+2025-11-12 16:59:03,373 | INFO | Copied Hans323: $1.00 (0.00% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0x212c418fcff6d82c8492855628c8968ad5233171febe4f4dd0451c83a91973aa
+2025-11-12 17:56:40,693 | INFO | Copied Hans323: $1.00 (0.00% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0x41feae008287a5fa714ed9f2919491413b63d5f979d4be8b5e006197214dfc60
+2025-11-12 17:56:53,830 | ERROR | Order failed: PolyApiException[status_code=400, error_message={'error': 'not enough balance / allowance'}]
+2025-11-12 18:40:19,425 | INFO | Starting multi-trader copytrader...
+2025-11-12 18:40:19,426 | INFO | Watching 1 traders:
+2025-11-12 18:40:19,426 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-12 19:23:07,698 | INFO | Starting multi-trader copytrader...
+2025-11-12 19:23:07,699 | INFO | Watching 1 traders:
+2025-11-12 19:23:07,699 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-12 20:07:51,531 | INFO | Starting multi-trader copytrader...
+2025-11-12 20:07:51,531 | INFO | Watching 2 traders:
+2025-11-12 20:07:51,531 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-12 20:07:51,531 | INFO | - 25usdc (0x75e765216a57942d738d880ffcda854d9f869080)
+2025-11-12 20:52:29,316 | INFO | Now mirroring piastri (0x2f09642639aedd6ced432519c1a86e7d52034632)
+2025-11-12 21:04:03,328 | INFO | Copied piastri: $2.80 (0.00% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0xdb617578265d0c8ba550258a91fe6c2e559f11425ed14794bf584151082d1f6a
+2025-11-12 21:07:35,621 | INFO | Copied piastri: $2.85 (0.87% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0x8486c77ed5685aeb0f9aa79dd347c26ae9dd5a04476a7c6ebb1243ae89640a78
+2025-11-12 21:07:35,965 | INFO | Copied piastri: $2.80 (0.00% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0x42995188f208d541a47a53b1bea7b68c82231f3f4a96485dac3e958137ed1b5e
+2025-11-12 21:19:49,027 | INFO | Copied piastri: $3.15 (0.00% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0x53d60be289004da7f7643552a025326508fdc2974bf8f7311d84e4f0a89f8ea8
+2025-11-12 21:27:45,309 | INFO | Copied Hans323: $1.00 (0.48% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0x9ebec55d7455665aade1a8801fdce241b48a782213e61da8fbd2e19fb042f77a
+2025-11-12 21:52:59,196 | ERROR | Order failed: PolyApiException[status_code=400, error_message={'error': 'not enough balance / allowance'}]
+2025-11-12 21:54:45,466 | INFO | Copied Hans323: $1.00 (0.01% of trader portfolio; deployment 100.0% (floored to $1 min)) order=0x8f446c2ddad5938e77cc3df3491377502bfd54ca2b255a16374dba0e957003d9
+2025-11-12 22:03:09,392 | ERROR | Order failed: PolyApiException[status_code=400, error_message={'error': 'not enough balance / allowance'}]
+2025-11-12 22:15:28,915 | ERROR | Order failed: PolyApiException[status_code=400, error_message={'error': 'not enough balance / allowance'}]
+2025-11-12 22:16:25,645 | ERROR | Order failed: PolyApiException[status_code=400, error_message={'error': 'not enough balance / allowance'}]
+2025-11-12 22:22:19,228 | INFO | Copied piastri: $3.65 (0.45% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0x96abc663bf0f28a162ab4899e04296f2fd39504ffcacc1be1d6ceb9274153959
+2025-11-12 22:25:17,337 | INFO | Copied piastri: $3.65 (0.20% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0x3a3d72d7f4bbc7a5b769fecb3e47cdad516900586f8cbefa7cdd2edbfa10a6bc

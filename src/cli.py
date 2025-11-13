@@ -62,6 +62,11 @@ class CopyTraderApp:
             }
         )
         self.trades_file = None
+        self.trade_recorder = None
+        self.trade_recorder_task = None
+        self.trade_tracking_cfg: Dict[str, Any] = {}
+        self._active_trade_tracking_cfg: Dict[str, Any] = {}
+        self._trade_recorder_update_needed = False
 
     def stop(self, *_):
         if self.logger:
@@ -74,6 +79,8 @@ class CopyTraderApp:
         self.cfg = cfg_mgr.load()
         self.config_mtime = Path(self.cfg_path).stat().st_mtime if Path(self.cfg_path).exists() else 0.0
         self.enabled_wallets = self._enabled_wallets(self.cfg)
+        self.trade_tracking_cfg = self.cfg.get("trade_tracking", {})
+        self._trade_recorder_update_needed = True
 
         log_cfg = self.cfg.get("logging", {})
         log_level = log_cfg.get("level", os.getenv("LOG_LEVEL", "INFO"))
@@ -102,6 +109,8 @@ class CopyTraderApp:
         self.poll_interval = int(self.cfg["monitoring"]["poll_interval"]) or 5
         self.portfolio_sync_interval = int(self.cfg["monitoring"]["portfolio_sync_interval"]) or 60
 
+        await self._reconcile_trade_recorder(log_level)
+
         # Initial portfolio sync so we have deployment stats before processing trades
         await self._sync_enabled_portfolios()
         last_portfolio_sync = asyncio.get_event_loop().time()
@@ -123,69 +132,73 @@ class CopyTraderApp:
         else:
             self.logger.info("Starting copytrader with no enabled traders.")
 
-        while self.running:
-            now = asyncio.get_event_loop().time()
+        try:
+            while self.running:
+                now = asyncio.get_event_loop().time()
 
-            self._maybe_reload_config()
+                self._maybe_reload_config()
+                await self._reconcile_trade_recorder(log_level)
 
-            # 1) Periodic portfolio sync
-            if now - last_portfolio_sync >= self.portfolio_sync_interval:
-                await self._sync_enabled_portfolios()
-                last_portfolio_sync = now
+                # 1) Periodic portfolio sync
+                if now - last_portfolio_sync >= self.portfolio_sync_interval:
+                    await self._sync_enabled_portfolios()
+                    last_portfolio_sync = now
 
-            # 2) Fetch new trades for all traders
-            all_lists = await self.monitor.monitor_all_traders()
-            new_trades = [t for sub in all_lists for t in sub]
+                # 2) Fetch new trades for all traders
+                all_lists = await self.monitor.monitor_all_traders()
+                new_trades = [t for sub in all_lists for t in sub]
 
-            # 3) Process trades
-            for tr in new_trades:
-                mirror_shares, reason, mirror_usd = self.risk_manager.calculate_mirror(tr)
-                if mirror_shares <= 0:
-                    if self.logger:
+                # 3) Process trades
+                for tr in new_trades:
+                    mirror_shares, reason, mirror_usd = self.risk_manager.calculate_mirror(tr)
+                    if mirror_shares <= 0:
+                        if self.logger:
+                            self.logger.info(
+                                f"Skip {tr['trader_name']} trade: {reason} (mirror shares {mirror_shares:.4f})"
+                            )
+                        continue
+
+                    ok, msg = self.risk_manager.validate_trade(tr, mirror_shares, mirror_usd)
+                    if not ok:
+                        self.logger.warning(f"Rejected trade from {tr['trader_name']}: {msg}")
+                        self._log_trade_event("rejected", tr, 0.0, mirror_usd, msg, {})
+                        continue
+
+                    if self.executor is None:
                         self.logger.info(
-                            f"Skip {tr['trader_name']} trade: {reason} (mirror shares {mirror_shares:.4f})"
+                            f"Dry-run: Would copy {tr['trader_name']} ${mirror_usd:.2f} ({reason})"
                         )
-                    continue
+                        self.risk_manager.update_exposure(tr, mirror_usd)
+                        self._log_trade_event("dry_run", tr, mirror_shares, mirror_usd, reason, {"status": "dry_run"})
+                        continue
 
-                ok, msg = self.risk_manager.validate_trade(tr, mirror_shares, mirror_usd)
-                if not ok:
-                    self.logger.warning(f"Rejected trade from {tr['trader_name']}: {msg}")
-                    self._log_trade_event("rejected", tr, 0.0, mirror_usd, msg, {})
-                    continue
+                    res = await self.executor.execute_mirror_trade(tr, mirror_shares)
+                    if res.get("success"):
+                        exec_usd = float(res.get("executed_usd", mirror_usd))
+                        exec_shares = float(res.get("executed_shares", mirror_shares))
+                        reason_text = reason
+                        if res.get("note"):
+                            reason_text = f"{reason_text}; {res['note']}"
+                        self.logger.info(
+                            f"Copied {tr['trader_name']}: ${exec_usd:.2f} ({reason_text}) order={res.get('order_id')}"
+                        )
+                        self.risk_manager.update_exposure(tr, exec_usd)
+                        self._log_trade_event("executed", tr, exec_shares, exec_usd, reason_text, res)
+                    else:
+                        self.logger.error(f"Order failed: {res.get('error')}")
+                        self._log_trade_event("failed", tr, mirror_shares, mirror_usd, res.get("error", ""), res)
 
-                if self.executor is None:
-                    self.logger.info(
-                        f"Dry-run: Would copy {tr['trader_name']} ${mirror_usd:.2f} ({reason})"
-                    )
-                    self.risk_manager.update_exposure(tr, mirror_usd)
-                    self._log_trade_event("dry_run", tr, mirror_shares, mirror_usd, reason, {"status": "dry_run"})
-                    continue
+                # 4) Persist status snapshot
+                snapshot = {
+                    "global_exposure_usd": self.risk_manager.global_exposure_usd,
+                    "per_trader_exposure_usd": self.risk_manager.current_exposure_usd,
+                    "portfolios": self.portfolio_tracker.portfolios,
+                }
+                persist_state(STATE_PATH, snapshot)
 
-                res = await self.executor.execute_mirror_trade(tr, mirror_shares)
-                if res.get("success"):
-                    exec_usd = float(res.get("executed_usd", mirror_usd))
-                    exec_shares = float(res.get("executed_shares", mirror_shares))
-                    reason_text = reason
-                    if res.get("note"):
-                        reason_text = f"{reason_text}; {res['note']}"
-                    self.logger.info(
-                        f"Copied {tr['trader_name']}: ${exec_usd:.2f} ({reason_text}) order={res.get('order_id')}"
-                    )
-                    self.risk_manager.update_exposure(tr, exec_usd)
-                    self._log_trade_event("executed", tr, exec_shares, exec_usd, reason_text, res)
-                else:
-                    self.logger.error(f"Order failed: {res.get('error')}")
-                    self._log_trade_event("failed", tr, mirror_shares, mirror_usd, res.get("error", ""), res)
-
-            # 4) Persist status snapshot
-            snapshot = {
-                "global_exposure_usd": self.risk_manager.global_exposure_usd,
-                "per_trader_exposure_usd": self.risk_manager.current_exposure_usd,
-                "portfolios": self.portfolio_tracker.portfolios,
-            }
-            persist_state(STATE_PATH, snapshot)
-
-            await asyncio.sleep(self.poll_interval)
+                await asyncio.sleep(self.poll_interval)
+        finally:
+            await self._stop_trade_recorder()
 
     def _maybe_reload_config(self) -> None:
         cfg_file = Path(self.cfg_path)
@@ -203,6 +216,8 @@ class CopyTraderApp:
         old_enabled = self.enabled_wallets
         self.cfg = new_cfg
         self.enabled_wallets = self._enabled_wallets(new_cfg)
+        self.trade_tracking_cfg = self.cfg.get("trade_tracking", {})
+        self._trade_recorder_update_needed = True
         newly_enabled = self.monitor.update_traders(new_cfg["traders"]) if self.monitor else set()
 
         self.poll_interval = int(new_cfg["monitoring"]["poll_interval"]) or 5
@@ -287,6 +302,59 @@ class CopyTraderApp:
         if tasks:
             await asyncio.gather(*tasks)
 
+    def _canonical_trade_tracking_cfg(self, cfg: Dict[str, Any], default_log_level: str) -> Dict[str, Any]:
+        return {
+            "output_dir": cfg.get("output_dir", "state/trader_trades"),
+            "state_path": cfg.get("state_path", "state/trade_history_state.json"),
+            "poll_interval": int(cfg.get("poll_interval", 30)),
+            "log_level": cfg.get("log_level", default_log_level),
+        }
+
+    async def _reconcile_trade_recorder(self, default_log_level: str) -> None:
+        if not self._trade_recorder_update_needed:
+            return
+        self._trade_recorder_update_needed = False
+        cfg = self.trade_tracking_cfg or {}
+        enabled = cfg.get("enabled", True)
+        if not enabled:
+            await self._stop_trade_recorder()
+            self._active_trade_tracking_cfg = {}
+            return
+
+        desired = self._canonical_trade_tracking_cfg(cfg, default_log_level)
+        if self.trade_recorder_task and not self.trade_recorder_task.done():
+            if desired != self._active_trade_tracking_cfg:
+                await self._stop_trade_recorder()
+            else:
+                if self.trade_recorder:
+                    self.trade_recorder.queue_trader_update(self.cfg.get("traders", []))
+                return
+
+        from .trade_recorder import TradeHistoryRecorder
+
+        self.trade_recorder = TradeHistoryRecorder(
+            self.cfg.get("traders", []),
+            output_dir=desired["output_dir"],
+            state_path=desired["state_path"],
+            poll_interval=desired["poll_interval"],
+            log_level=desired["log_level"],
+        )
+        self.trade_recorder_task = asyncio.create_task(self.trade_recorder.run())
+        self._active_trade_tracking_cfg = desired
+
+    async def _stop_trade_recorder(self) -> None:
+        if not self.trade_recorder_task:
+            self.trade_recorder = None
+            return
+        self.trade_recorder_task.cancel()
+        try:
+            await self.trade_recorder_task
+        except asyncio.CancelledError:
+            pass
+        self.trade_recorder_task = None
+        self.trade_recorder = None
+        self._active_trade_tracking_cfg = {}
+
 
 @click.group()
 def cli():
@@ -333,6 +401,37 @@ def resume(trader_name: str):
 def stop():
     """Stop all copytrading (Ctrl+C the running process)."""
     click.echo("To stop, press Ctrl+C in the running process.")
+
+
+@cli.command("track-trades")
+@click.option("--config", default="config/settings.yaml", help="Config file path")
+@click.option("--output-dir", default="state/trader_trades", help="Directory for per-trader trade logs")
+@click.option("--state-path", default="state/trade_history_state.json", help="State file to resume tracking progress")
+@click.option("--poll-interval", default=30, show_default=True, help="Seconds between trade refreshes")
+@click.option("--log-level", default="INFO", show_default=True, help="Logging level (DEBUG, INFO, etc.)")
+def track_trades(config: str, output_dir: str, state_path: str, poll_interval: int, log_level: str):
+    """Continuously record historical trades for all enabled traders."""
+    load_env()
+    cfg_mgr = ConfigManager(config)
+    try:
+        cfg = cfg_mgr.load()
+    except ConfigError as exc:  # pragma: no cover - CLI validation
+        raise click.ClickException(str(exc))
+
+    from .trade_recorder import TradeHistoryRecorder
+
+    recorder = TradeHistoryRecorder(
+        cfg.get("traders", []),
+        output_dir=output_dir,
+        state_path=state_path,
+        poll_interval=poll_interval,
+        log_level=log_level,
+    )
+
+    try:
+        asyncio.run(recorder.run())
+    except KeyboardInterrupt:
+        click.echo("Stopped trade tracking.")
 
 
 if __name__ == "__main__":  # pragma: no cover
