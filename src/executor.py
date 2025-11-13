@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict
 
 
@@ -7,12 +8,20 @@ class MissingDependency(Exception):
 
 try:
     from py_clob_client.client import ClobClient
-    from py_clob_client.clob_types import ApiCreds, OrderArgs, OrderType
+    from py_clob_client.clob_types import (
+        ApiCreds,
+        AssetType,
+        BalanceAllowanceParams,
+        OrderArgs,
+        OrderType,
+    )
     from py_clob_client.order_builder.constants import BUY, SELL
 except Exception as e:  # pragma: no cover
     ClobClient = None  # type: ignore
     OrderArgs = None  # type: ignore
     OrderType = None  # type: ignore
+    AssetType = None  # type: ignore
+    BalanceAllowanceParams = None  # type: ignore
     BUY = "BUY"  # fallbacks for type hints
     SELL = "SELL"
 
@@ -31,6 +40,7 @@ class TradeExecutor:
         signature_type = int(account_cfg.get("signature_type", 1))
         proxy_address = account_cfg.get("proxy_address")
         self.min_order_size_cache: Dict[str, float] = {}
+        self.logger = logging.getLogger("copytrader")
 
         self.client = ClobClient(
             host,
@@ -57,6 +67,7 @@ class TradeExecutor:
             raise MissingDependency("Unable to obtain Polymarket API credentials.")
 
         self.client.set_api_creds(creds)
+        self._refresh_collateral()
 
     def _get_min_order_size(self, token_id: str) -> float:
         if token_id in self.min_order_size_cache:
@@ -96,6 +107,11 @@ class TradeExecutor:
 
     async def execute_mirror_trade(self, original_trade: Dict[str, Any], mirror_shares: float) -> Dict[str, Any]:
         """Places a limit order mirroring the observed trade size (shares)."""
+        return await self._place_order(original_trade, mirror_shares, allow_refresh=True)
+
+    async def _place_order(
+        self, original_trade: Dict[str, Any], mirror_shares: float, allow_refresh: bool
+    ) -> Dict[str, Any]:
         try:
             side_str = str(original_trade.get("side", "BUY")).upper()
             side = BUY if side_str == "BUY" else SELL
@@ -125,4 +141,22 @@ class TradeExecutor:
                 "note": minimums.get("note"),
             }
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            message = str(e)
+            if allow_refresh and "not enough balance / allowance" in message.lower():
+                self.logger.warning(
+                    "Order rejected due to balance/allowance. Refreshing collateral and retrying once."
+                )
+                self._refresh_collateral()
+                return await self._place_order(original_trade, mirror_shares, allow_refresh=False)
+            return {"success": False, "error": message}
+
+    def _refresh_collateral(self) -> None:
+        params = BalanceAllowanceParams(asset_type=AssetType.COLLATERAL)
+        try:
+            self.client.update_balance_allowance(params)
+            info = self.client.get_balance_allowance(params)
+            balance = float(info.get("balance", 0)) / 1_000_000 if isinstance(info, dict) else None
+            if balance is not None:
+                self.logger.info(f"Refreshed Polymarket collateral. Available USDC: {balance:.2f}")
+        except Exception as exc:  # pragma: no cover - network error handling
+            self.logger.warning(f"Failed to refresh collateral/allowance: {exc}")

@@ -36,6 +36,11 @@ traders:
     allocated_capital: 110
     enabled: true
 
+  - name: "kch123"
+    wallet_address: "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee"
+    allocated_capital: 10
+    enabled: true
+
 
 risk_management:
   global:
