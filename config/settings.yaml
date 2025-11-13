@@ -59,7 +59,7 @@ risk_management:
     min_liquidity: 500.0
 
 monitoring:
-  poll_interval: 5
+  poll_interval: 1
   portfolio_sync_interval: 60
 
 trade_tracking:

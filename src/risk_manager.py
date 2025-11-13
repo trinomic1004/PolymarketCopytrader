@@ -40,9 +40,7 @@ class RiskManager:
 
         # Our USD exposure to mirror and convert to shares
         mirror_usd = max(effective_alloc * position_pct, 0.0)
-        if 0 < mirror_usd < MIN_ORDER_USD:
-            if effective_alloc < MIN_ORDER_USD:
-                return 0.0, "Allocated capital below $1 minimum order", 0.0
+        if mirror_usd < MIN_ORDER_USD:
             mirror_usd = MIN_ORDER_USD
 
         mirror_shares = mirror_usd / max(price, 1e-9)
@@ -62,9 +60,10 @@ class RiskManager:
             return False, f"Exceeds max single bet: ${mirror_usd:.2f}"
 
         # Check 2: Per-trader max position percentage of allocated
-        allocated = float(trade["allocated_capital"]) or 1.0
+        raw_allocated = float(trade["allocated_capital"]) or 0.0
+        effective_allocated = max(raw_allocated, MIN_ORDER_USD)
         if side == "BUY":
-            position_pct = mirror_usd / allocated
+            position_pct = mirror_usd / effective_allocated
             max_pct = float(self.config["per_trader"]["max_position_pct"]) or 1.0
             if position_pct > max_pct:
                 return False, f"Exceeds max position %: {position_pct*100:.1f}%"
@@ -78,7 +77,7 @@ class RiskManager:
         # Check 4: Per-trader exposure against allocated capital
         trader_exposure = float(self.current_exposure_usd.get(trader_wallet, 0.0))
         projected = max(trader_exposure + delta, 0.0)
-        if projected > allocated:
+        if projected > effective_allocated:
             return False, "Exceeds allocated capital for trader"
 
         # Check 5: Market filters placeholder (can integrate categories/liquidity)

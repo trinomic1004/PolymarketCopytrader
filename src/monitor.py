@@ -53,8 +53,9 @@ class MultiTraderMonitor:
             new_trades.append(normalized)
 
         # Most recent first
-        new_trades.sort(key=lambda x: x["timestamp"])  # oldest → newest
-        return new_trades
+        aggregated = self._aggregate_trades(new_trades)
+        aggregated.sort(key=lambda x: x["timestamp"])  # oldest → newest
+        return aggregated
 
     async def _fetch_trades(self, wallet: str, limit: int = 50) -> List[Dict[str, Any]]:
         async with aiohttp.ClientSession() as session:
@@ -77,3 +78,42 @@ class MultiTraderMonitor:
             self.last_check.pop(wallet, None)
         self.traders = traders_config
         return new_enabled - old_enabled
+
+    def _aggregate_trades(self, trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        grouped: Dict[str, Dict[str, Any]] = {}
+        for tr in trades:
+            key = self._aggregation_key(tr)
+            if key not in grouped:
+                grouped[key] = {
+                    **tr,
+                    "_size_sum": 0.0,
+                    "_price_notional": 0.0,
+                    "timestamp": tr["timestamp"],
+                }
+            entry = grouped[key]
+            entry["_size_sum"] += tr["size"]
+            entry["_price_notional"] += tr["price"] * tr["size"]
+            entry["timestamp"] = max(entry["timestamp"], tr["timestamp"])
+
+        aggregated: List[Dict[str, Any]] = []
+        for entry in grouped.values():
+            size = entry["_size_sum"]
+            notional = entry["_price_notional"]
+            price = notional / max(size, 1e-9)
+            entry["size"] = size
+            entry["price"] = price
+            entry.pop("_size_sum", None)
+            entry.pop("_price_notional", None)
+            aggregated.append(entry)
+        return aggregated
+
+    def _aggregation_key(self, trade: Dict[str, Any]) -> str:
+        tx_hash = str(trade.get("transactionHash") or "").lower()
+        if tx_hash:
+            return f"tx:{tx_hash}:{trade.get('tokenID')}:{trade.get('side')}"
+        return "ts:{timestamp}:{token}:{side}:{price}".format(
+            timestamp=trade.get("timestamp"),
+            token=trade.get("tokenID"),
+            side=trade.get("side"),
+            price=trade.get("price"),
+        )

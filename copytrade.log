@@ -5,3 +5,12 @@
 2025-11-12 23:45:01,598 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
 2025-11-12 23:45:01,598 | INFO | - piastri (0x2f09642639aedd6ced432519c1a86e7d52034632)
 2025-11-12 23:51:14,389 | INFO | Now mirroring kch123 (0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee)
+2025-11-12 23:56:50,354 | INFO | Stopping copytrader...
+2025-11-12 23:57:01,876 | INFO | Refreshed Polymarket collateral. Available USDC: 203.61
+2025-11-12 23:57:02,397 | INFO | Starting multi-trader copytrader...
+2025-11-12 23:57:02,397 | INFO | Watching 3 traders:
+2025-11-12 23:57:02,398 | INFO | - Hans323 (0x0f37cb80dee49d55b5f6d9e595d52591d6371410)
+2025-11-12 23:57:02,398 | INFO | - piastri (0x2f09642639aedd6ced432519c1a86e7d52034632)
+2025-11-12 23:57:02,398 | INFO | - kch123 (0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee)
+2025-11-13 00:09:50,947 | INFO | Copied kch123: $2.20 (0.01% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0x74de5dbc29fdf64673c710e02c963b8554177af4c1b93a015514959e618968bf
+2025-11-13 00:33:51,267 | INFO | Copied kch123: $1.90 (0.41% of trader portfolio; deployment 100.0% (floored to $1 min); raised to market min 5.0000 shares) order=0x6d42d80fd4174302890416bd5149faf9c337729acdf571901c386f3314e07390
